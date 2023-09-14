@@ -24,6 +24,10 @@ pub enum BankSudo {
         to_address: String,
         amount: Vec<Coin>,
     },
+    Burn {
+        from_address: String,
+        amount: Vec<Coin>,
+    },
 }
 
 pub trait Bank: Module<ExecT = BankMsg, QueryT = BankQuery, SudoT = BankSudo> {}
@@ -191,6 +195,14 @@ impl Module for BankKeeper {
             BankSudo::Mint { to_address, amount } => {
                 let to_address = api.addr_validate(&to_address)?;
                 self.mint(&mut bank_storage, to_address, amount)?;
+                Ok(AppResponse::default())
+            }
+            BankSudo::Burn {
+                from_address,
+                amount,
+            } => {
+                let from_address = api.addr_validate(&from_address)?;
+                self.burn(&mut bank_storage, from_address, amount)?;
                 Ok(AppResponse::default())
             }
         }
